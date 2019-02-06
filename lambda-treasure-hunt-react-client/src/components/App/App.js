@@ -15,6 +15,7 @@ const AppWrapper = styled.div`
 const TopWrapper = styled.div`
   display: flex;
   width: 100%;
+  height: 78%;
   justify-content: space-around;
   margin-bottom: 1%;
 `;
@@ -22,6 +23,7 @@ const TopWrapper = styled.div`
 const BottomWrapper = styled.div`
   display: flex;
   width: 100%;
+  height: 22%;
   justify-content: space-around;
 `;
 
