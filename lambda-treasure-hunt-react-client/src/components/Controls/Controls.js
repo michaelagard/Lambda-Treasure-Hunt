@@ -1,4 +1,4 @@
-import React, { Component } from "react";
+import React from "react";
 import styled from "styled-components";
 
 const ControlsWrapper = styled.div`
@@ -6,10 +6,12 @@ const ControlsWrapper = styled.div`
   border: 5px solid black;
 `;
 
-class Controls extends Component {
-  render() {
-    return <ControlsWrapper>Controls</ControlsWrapper>;
-  }
-}
+const Controls = props => {
+  return (
+    <ControlsWrapper>
+      <button onClick={props.onClick}>Add Data to Console</button>
+    </ControlsWrapper>
+  );
+};
 
 export default Controls;

@@ -28,6 +28,15 @@ const BottomWrapper = styled.div`
 `;
 
 class App extends Component {
+  state = {
+    consoleData: "This data is coming from the consoleData state."
+  };
+  onClick = () => {
+    this.setState({
+      consoleData: `You've clicked the button!`
+    });
+    console.log("This Click Happened");
+  };
   render() {
     return (
       <AppWrapper>
@@ -36,8 +45,8 @@ class App extends Component {
           <Sidebar />
         </TopWrapper>
         <BottomWrapper>
-          <Console />
-          <Controls />
+          <Console data={this.state.consoleData} />
+          <Controls onClick={this.onClick} />
         </BottomWrapper>
       </AppWrapper>
     );
