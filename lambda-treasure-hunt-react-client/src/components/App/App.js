@@ -5,6 +5,68 @@ import Controls from "../Controls/Controls";
 import Sidebar from "../Sidebar/Sidebar";
 import Map from "../Map/Map";
 
+class App extends Component {
+  state = {
+    consoleData: []
+  };
+
+  checkInventory = () => {
+    let msg = ["Inventory: "];
+    this.setState({
+      consoleData: [msg, ...this.state.consoleData]
+    });
+  };
+
+  moveUp = () => {
+    let msg = ["You attempt to move up."];
+    this.setState({
+      consoleData: [msg, ...this.state.consoleData]
+    });
+  };
+
+  moveLeft = () => {
+    let msg = ["You attempt to move left."];
+    this.setState({
+      consoleData: [msg, ...this.state.consoleData]
+    });
+  };
+
+  moveDown = () => {
+    let msg = ["You attempt to move down."];
+    this.setState({
+      consoleData: [msg, ...this.state.consoleData]
+    });
+  };
+
+  moveRight = () => {
+    let msg = ["You attempt to move right."];
+    this.setState({
+      consoleData: [msg, ...this.state.consoleData]
+    });
+  };
+
+  render() {
+    return (
+      <AppWrapper>
+        <TopWrapper>
+          <Map />
+          <Sidebar />
+        </TopWrapper>
+        <BottomWrapper>
+          <Console data={this.state.consoleData} />
+          <Controls
+            checkInventory={this.checkInventory}
+            moveUp={this.moveUp}
+            moveLeft={this.moveLeft}
+            moveDown={this.moveDown}
+            moveRight={this.moveRight}
+          />
+        </BottomWrapper>
+      </AppWrapper>
+    );
+  }
+}
+
 const AppWrapper = styled.div`
   display: flex;
   padding: 8px;
@@ -23,34 +85,9 @@ const TopWrapper = styled.div`
 const BottomWrapper = styled.div`
   display: flex;
   width: 100%;
-  height: 22%;
+  max-height: 20%;
+  height: 20%;
   justify-content: space-around;
 `;
-
-class App extends Component {
-  state = {
-    consoleData: "This data is coming from the consoleData state."
-  };
-  onClick = () => {
-    this.setState({
-      consoleData: `You've clicked the button!`
-    });
-    console.log("This Click Happened");
-  };
-  render() {
-    return (
-      <AppWrapper>
-        <TopWrapper>
-          <Map />
-          <Sidebar />
-        </TopWrapper>
-        <BottomWrapper>
-          <Console data={this.state.consoleData} />
-          <Controls onClick={this.onClick} />
-        </BottomWrapper>
-      </AppWrapper>
-    );
-  }
-}
 
 export default App;
