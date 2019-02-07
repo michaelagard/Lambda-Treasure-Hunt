@@ -4,45 +4,53 @@ import Console from "../Console/Console";
 import Controls from "../Controls/Controls";
 import Sidebar from "../Sidebar/Sidebar";
 import Map from "../Map/Map";
-
+import { connect } from "react-redux";
+import { checkStatus, playerInitialization } from "../../actions";
 class App extends Component {
   state = {
-    consoleData: []
+    consoleData: [],
+    serverState: {},
+    statusState: {
+      cooldown: 0,
+      encumbrance: 0,
+      errors: [],
+      gold: 0,
+      inventory: [],
+      messages: [],
+      name: "",
+      speed: 0,
+      status: [],
+      strength: 0
+    }
+  };
+
+  componentDidMount() {
+    this.props.playerInitialization();
+  }
+  componentWillReceiveProps(newProps) {
+    this.setState({ statusState: newProps.statusState });
+  }
+
+  handleControls = input => {
+    if (input.match(/^(u|l|d|r)$/)) {
+      this.playerMove(input);
+      console.log(input);
+    }
+  };
+
+  playerMove = direction => {
+    let msg = [`You attempt to move ${direction}.`];
+    this.setState({
+      consoleData: [msg, ...this.state.consoleData]
+    });
   };
 
   checkInventory = () => {
-    let msg = ["Inventory: "];
-    this.setState({
-      consoleData: [msg, ...this.state.consoleData]
-    });
-  };
-
-  moveUp = () => {
-    let msg = ["You attempt to move up."];
-    this.setState({
-      consoleData: [msg, ...this.state.consoleData]
-    });
-  };
-
-  moveLeft = () => {
-    let msg = ["You attempt to move left."];
-    this.setState({
-      consoleData: [msg, ...this.state.consoleData]
-    });
-  };
-
-  moveDown = () => {
-    let msg = ["You attempt to move down."];
-    this.setState({
-      consoleData: [msg, ...this.state.consoleData]
-    });
-  };
-
-  moveRight = () => {
-    let msg = ["You attempt to move right."];
-    this.setState({
-      consoleData: [msg, ...this.state.consoleData]
-    });
+    this.props.checkStatus();
+    // console.log(`STATUS: NAME : ${this.state.statusState.name}`);
+    // this.setState({
+    //   statusState: this.props.statusState
+    // });
   };
 
   render() {
@@ -50,16 +58,13 @@ class App extends Component {
       <AppWrapper>
         <TopWrapper>
           <Map />
-          <Sidebar />
+          <Sidebar statusState={this.state.statusState} />
         </TopWrapper>
         <BottomWrapper>
           <Console data={this.state.consoleData} />
           <Controls
             checkInventory={this.checkInventory}
-            moveUp={this.moveUp}
-            moveLeft={this.moveLeft}
-            moveDown={this.moveDown}
-            moveRight={this.moveRight}
+            handleControls={this.handleControls}
           />
         </BottomWrapper>
       </AppWrapper>
@@ -90,4 +95,13 @@ const BottomWrapper = styled.div`
   justify-content: space-around;
 `;
 
-export default App;
+const mapStateToProps = state => ({
+  statusState: state.statusState,
+  fetching_status: state.fetching,
+  fetch_status_error: state.error
+});
+
+export default connect(
+  mapStateToProps,
+  { checkStatus, playerInitialization }
+)(App);
