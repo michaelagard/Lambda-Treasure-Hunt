@@ -6,12 +6,12 @@ const Controls = props => {
       <button onClick={props.checkInventory}>Inventory</button>
       <Directions>
         <TopDirection>
-          <button onClick={props.moveUp}>/\</button>
+          <button onClick={() => props.handleControls("up")}>/\</button>
         </TopDirection>
         <BottomDirections>
-          <button onClick={props.moveLeft}>{"<"}</button>
-          <button onClick={props.moveDown}>\/</button>
-          <button onClick={props.moveRight}>></button>
+          <button onClick={() => props.handleControls("left")}>{"<"}</button>
+          <button onClick={() => props.handleControls("down")}>\/</button>
+          <button onClick={() => props.handleControls("right")}>></button>
         </BottomDirections>
       </Directions>
     </ControlsWrapper>
