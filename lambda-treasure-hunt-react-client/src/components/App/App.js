@@ -5,7 +5,7 @@ import Controls from "../Controls/Controls";
 import Sidebar from "../Sidebar/Sidebar";
 import Map from "../Map/Map";
 import { connect } from "react-redux";
-import { checkStatus, playerMove } from "../../actions";
+import { checkStatus, playerMove, playerInitialization } from "../../actions";
 class App extends Component {
   state = {
     console: []
@@ -14,19 +14,31 @@ class App extends Component {
 
   componentDidMount() {
     this.props.checkStatus();
+    this.props.playerInitialization();
   }
 
   componentWillReceiveProps(np) {
-    const msg = ([np.room.description],
-    [`Current Coordinates: ${np.room.coordinates}`]);
+    if (np.room !== this.props.room) {
+      let consoleData = this.state.console;
+      let msg = [
+        <hr />,
+        `Exits: ${np.room.exits}`,
+        np.room.description,
+        np.room.messages
+      ];
+      console.log(msg);
 
-    this.setState({
-      console: [msg, ...this.state.console]
-    });
+      for (let i = 0; i < msg.length; i++) {
+        consoleData.splice(0, 0, msg[i]);
+      }
+      this.setState({
+        console: consoleData
+      });
+    }
   }
-
   handleControls = input => {
     if (input.match(/^(n|w|s|e)$/)) {
+      localStorage.setItem("test", input);
       this.props.playerMove({ direction: input });
     }
   };
@@ -64,7 +76,7 @@ const AppWrapper = styled.div`
 const TopWrapper = styled.div`
   display: flex;
   width: 100%;
-  height: 78%;
+  height: 77%;
   justify-content: space-around;
   margin-bottom: 1%;
 `;
@@ -86,5 +98,5 @@ const mapStateToProps = state => ({
 
 export default connect(
   mapStateToProps,
-  { checkStatus, playerMove }
+  { checkStatus, playerMove, playerInitialization }
 )(App);
