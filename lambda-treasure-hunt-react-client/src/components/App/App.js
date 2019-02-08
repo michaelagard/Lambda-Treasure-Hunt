@@ -5,52 +5,34 @@ import Controls from "../Controls/Controls";
 import Sidebar from "../Sidebar/Sidebar";
 import Map from "../Map/Map";
 import { connect } from "react-redux";
-import { checkStatus, playerInitialization } from "../../actions";
+import { checkStatus, playerMove } from "../../actions";
 class App extends Component {
   state = {
-    consoleData: [],
-    serverState: {},
-    statusState: {
-      cooldown: 0,
-      encumbrance: 0,
-      errors: [],
-      gold: 0,
-      inventory: [],
-      messages: [],
-      name: "",
-      speed: 0,
-      status: [],
-      strength: 0
-    }
+    console: []
+    // auto: "True"
   };
 
   componentDidMount() {
-    this.props.playerInitialization();
+    this.props.checkStatus();
   }
-  componentWillReceiveProps(newProps) {
-    this.setState({ statusState: newProps.statusState });
+
+  componentWillReceiveProps(np) {
+    const msg = ([np.room.description],
+    [`Current Coordinates: ${np.room.coordinates}`]);
+
+    this.setState({
+      console: [msg, ...this.state.console]
+    });
   }
 
   handleControls = input => {
-    if (input.match(/^(u|l|d|r)$/)) {
-      this.playerMove(input);
-      console.log(input);
+    if (input.match(/^(n|w|s|e)$/)) {
+      this.props.playerMove({ direction: input });
     }
-  };
-
-  playerMove = direction => {
-    let msg = [`You attempt to move ${direction}.`];
-    this.setState({
-      consoleData: [msg, ...this.state.consoleData]
-    });
   };
 
   checkInventory = () => {
     this.props.checkStatus();
-    // console.log(`STATUS: NAME : ${this.state.statusState.name}`);
-    // this.setState({
-    //   statusState: this.props.statusState
-    // });
   };
 
   render() {
@@ -58,10 +40,10 @@ class App extends Component {
       <AppWrapper>
         <TopWrapper>
           <Map />
-          <Sidebar statusState={this.state.statusState} />
+          <Sidebar status={this.props.status} room={this.props.room} />
         </TopWrapper>
         <BottomWrapper>
-          <Console data={this.state.consoleData} />
+          <Console data={this.state.console} />
           <Controls
             checkInventory={this.checkInventory}
             handleControls={this.handleControls}
@@ -96,12 +78,13 @@ const BottomWrapper = styled.div`
 `;
 
 const mapStateToProps = state => ({
-  statusState: state.statusState,
+  status: state.status,
+  room: state.room,
   fetching_status: state.fetching,
   fetch_status_error: state.error
 });
 
 export default connect(
   mapStateToProps,
-  { checkStatus, playerInitialization }
+  { checkStatus, playerMove }
 )(App);
