@@ -4,12 +4,15 @@ import {
   FETCH_STATUS_ERROR,
   FETCHING_INIT,
   FETCHED_INIT,
-  FETCH_INIT_ERROR
+  FETCH_INIT_ERROR,
+  MOVING_PLAYER,
+  MOVED_PLAYER,
+  MOVE_PLAYER_ERROR
 } from "../actions";
 
 // const initialState = {};
 const initialState = {
-  statusState: {
+  status: {
     cooldown: 0,
     encumbrance: 0,
     errors: [],
@@ -20,6 +23,20 @@ const initialState = {
     speed: 0,
     status: [],
     strength: 0
+  },
+  room: {
+    cooldown: 0,
+    coordinates: "",
+    description: "",
+    elevation: 0,
+    errors: [],
+    exits: [],
+    items: [],
+    messages: [],
+    players: [],
+    room_id: 0,
+    terrain: "",
+    title: ""
   }
 };
 const rootReducer = (state = initialState, action) => {
@@ -30,7 +47,7 @@ const rootReducer = (state = initialState, action) => {
     case FETCHED_STATUS:
       return {
         ...state,
-        statusState: action.payload,
+        status: action.payload,
         fetching_status: false
       };
 
@@ -56,6 +73,23 @@ const rootReducer = (state = initialState, action) => {
         ...state,
         fetching_init: false,
         fetch_init_error: `${action.payload}`
+      };
+
+    case MOVING_PLAYER:
+      return { ...state, moving_player: true };
+
+    case MOVED_PLAYER:
+      return {
+        ...state,
+        room: action.payload,
+        moving_player: false
+      };
+
+    case MOVE_PLAYER_ERROR:
+      return {
+        ...state,
+        moving_player: false,
+        move_player_error: `${action.payload}`
       };
 
     default:
