@@ -2,9 +2,9 @@ import {
   FETCHING_STATUS,
   FETCHED_STATUS,
   FETCH_STATUS_ERROR,
-  FETCHING_INIT,
-  FETCHED_INIT,
-  FETCH_INIT_ERROR,
+  INITIALIZING,
+  INITIALIZED,
+  INITIALIZED_ERROR,
   MOVING_PLAYER,
   MOVED_PLAYER,
   MOVE_PLAYER_ERROR
@@ -58,17 +58,17 @@ const rootReducer = (state = initialState, action) => {
         fetch_status_error: `${action.payload}`
       };
 
-    case FETCHING_INIT:
+    case INITIALIZING:
       return { ...state, fetching_init: true };
 
-    case FETCHED_INIT:
+    case INITIALIZED:
       return {
         ...state,
-        initState: action.payload,
+        room: action.payload,
         fetching_init: false
       };
 
-    case FETCH_INIT_ERROR:
+    case INITIALIZED_ERROR:
       return {
         ...state,
         fetching_init: false,
