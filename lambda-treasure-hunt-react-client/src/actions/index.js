@@ -8,9 +8,9 @@ export const FETCHING_STATUS = "FETCHING_STATUS";
 export const FETCHED_STATUS = "FETCHED_STATUS";
 export const FETCH_STATUS_ERROR = "FETCH_STATUS_ERROR";
 
-export const FETCHING_INIT = "FETCHING_INIT";
-export const FETCHED_INIT = "FETCHED_INIT";
-export const FETCH_INIT_ERROR = "FETCH_INIT_ERROR";
+export const INITIALIZING = "INITIALIZING";
+export const INITIALIZED = "INITIALIZED";
+export const INITIALIZED_ERROR = "INITIALIZED_ERROR";
 
 export const MOVING_PLAYER = "MOVING_PLAYER";
 export const MOVED_PLAYER = "MOVED_PLAYER";
@@ -30,19 +30,19 @@ export const checkStatus = () => {
   };
 };
 
-// export const playerInitialization = () => {
-//   return dispatch => {
-//     dispatch({ type: FETCHING_INIT });
-//     axios
-//       .post("https://lambda-treasure-hunt.herokuapp.com/api/adv/init/")
+export const playerInitialization = () => {
+  return dispatch => {
+    dispatch({ type: INITIALIZING });
+    axios
+      .get("https://lambda-treasure-hunt.herokuapp.com/api/adv/init/")
 
-//       .then(response => {
-//         dispatch({ type: FETCHED_INIT, payload: response.data });
-//       })
+      .then(response => {
+        dispatch({ type: INITIALIZED, payload: response.data });
+      })
 
-//       .catch(error => dispatch({ type: FETCH_INIT_ERROR, error: error }));
-//   };
-// };
+      .catch(error => dispatch({ type: INITIALIZED_ERROR, error: error }));
+  };
+};
 
 export const playerMove = direction => {
   return dispatch => {
