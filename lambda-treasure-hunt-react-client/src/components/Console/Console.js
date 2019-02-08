@@ -9,11 +9,15 @@ const ConsoleWrapper = styled.div`
   overflow: hidden;
 `;
 
+const Message = styled.li`
+  /* font-size: 1px; */
+`;
+
 const Console = props => {
   return (
     <ConsoleWrapper>
       {props.data.map(item => (
-        <li key={item + Math.random()}>{item}</li>
+        <Message key={item + Math.random()}>{item}</Message>
       ))}
     </ConsoleWrapper>
   );
