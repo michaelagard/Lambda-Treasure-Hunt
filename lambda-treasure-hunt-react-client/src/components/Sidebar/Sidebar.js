@@ -9,15 +9,32 @@ const SidebarWrapper = styled.div`
 const Sidebar = props => {
   return (
     <SidebarWrapper>
+      <h2>Player Information</h2>
       <ul>
-        <li>Name: {props.statusState["name"]}</li>
-        <li>Cooldown: {props.statusState["cooldown"]}</li>
-        <li>Gold: {props.statusState["gold"]}</li>
-        <li>Inventory: {props.statusState["inventory"]}</li>
-        <li>Encumberance: {props.statusState["encumbrance"]}</li>
-        <li>Speed: {props.statusState["speed"]}</li>
-        <li>Strength: {props.statusState["strength"]}</li>
-        <li>Status: {props.statusState["status"]}</li>
+        <li>Name: {props.status["name"]}</li>
+        <li>Cooldown: {props.status["cooldown"]}</li>
+        <li>Gold: {props.status["gold"]}</li>
+        <li>Inventory: {props.status["inventory"]}</li>
+        <li>Encumberance: {props.status["encumbrance"]}</li>
+        <li>Speed: {props.status["speed"]}</li>
+        <li>Strength: {props.status["strength"]}</li>
+        <li>Status: {props.status["status"]}</li>
+      </ul>
+      <hr />
+      <h2>Room Information</h2>
+      <ul>
+        <li>Cooldown: {props.room.cooldown}</li>
+        <li>Coordinates: {props.room.coordinates}</li>
+        <li>Description: {props.room.description}</li>
+        <li>Elevation: {props.room.elevation}</li>
+        <li>Errors: {props.room.errors}</li>
+        <li>Exits: {props.room.exits}</li>
+        <li>Items: {props.room.items}</li>
+        <li>Messages: {props.room.messages}</li>
+        <li>Players: {props.room.players}</li>
+        <li>Room ID: {props.room.room_id}</li>
+        <li>Terrain: {props.room.terrain}</li>
+        <li>Title: {props.room.title}</li>
       </ul>
     </SidebarWrapper>
   );
