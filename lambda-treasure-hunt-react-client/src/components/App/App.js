@@ -26,8 +26,6 @@ class App extends Component {
         np.room.description,
         np.room.messages
       ];
-      console.log(msg);
-
       for (let i = 0; i < msg.length; i++) {
         consoleData.splice(0, 0, msg[i]);
       }
@@ -36,6 +34,11 @@ class App extends Component {
       });
     }
   }
+
+  setMapPropsToStorage = () => {
+    localStorage.setItem("map", JSON.stringify(this.props.map));
+  };
+
   handleControls = input => {
     if (input.match(/^(n|w|s|e)$/)) {
       localStorage.setItem("test", input);
@@ -46,7 +49,88 @@ class App extends Component {
   checkInventory = () => {
     this.props.checkStatus();
   };
+  // ------------------------ \\
+  // Traversal Code Goes Here \\
+  // ------------------------ \\
 
+  breadthFirstTraversal = () => {
+    const map = JSON.parse(localStorage.getItem("map"));
+    let visitingRoom = this.props.room.room_id;
+    let reverseDirection = {
+      n: "s",
+      s: "n",
+      w: "e",
+      e: "w"
+    };
+    let traversalPath = [];
+    function generateRoom() {
+      if (map.includes(visitingRoom)) {
+        return null;
+      } else {
+        for (let path of this.map[visitingRoom]) {
+          if (map[visitingRoom][path] === "?") {
+            return path;
+          }
+        }
+      }
+    }
+    function firstDirection() {
+      for (let path of this.map[visitingRoom]) {
+        if (map[visitingRoom][path] === "?") {
+          return path;
+        }
+      }
+    }
+    function travel(direction) {
+      let previousRoom = this.props.room.room_id;
+      if (direction) {
+        travel(direction);
+        generateRoom();
+        map[visitingRoom][reverseDirection[direction]] = previousRoom;
+        map[previousRoom][direction] = visitingRoom;
+        traversalPath.append(direction);
+      } else {
+        let roomList = backtrackToNearestUnexploredRoom();
+        if (roomList.length === 0) {
+          return false;
+        }
+        for (let direction in roomsToDirections(roomList)) {
+          travel(direction);
+          traversalPath.append(direction);
+        }
+      }
+      return true;
+    }
+    function backtrackToNearestUnexploredRoom() {
+      let queue = [];
+      let visited = [];
+      queue.push([visitingRoom]);
+      while (queue.length > 0) {
+        let path = queue.shift();
+        let node = path[queue.length - 1];
+        if (node.includes(visited)) {
+          return null;
+        } else {
+          for (let exit in map[node]) {
+            if (map[node][exit] === "?") {
+              return path;
+            } else {
+              let upath = path;
+              upath.append(map[node][exit]);
+              queue.push(upath);
+            }
+          }
+        }
+      }
+      return [];
+    }
+    function roomsToDirections(roomList) {
+      let currentRoom = roomList[0];
+      let directionList = [];
+    }
+  };
+
+  // ------------------------ \\
   render() {
     return (
       <AppWrapper>
