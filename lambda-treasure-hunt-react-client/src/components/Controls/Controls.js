@@ -4,6 +4,7 @@ const Controls = props => {
   return (
     <ControlsWrapper>
       <button onClick={props.checkInventory}>Inventory</button>
+      <button onClick={props.startAuto}>Auto</button>
       <Directions>
         <TopDirection>
           <button onClick={() => props.handleControls("n")}>n</button>
