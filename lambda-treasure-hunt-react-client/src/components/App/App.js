@@ -8,8 +8,8 @@ import { connect } from "react-redux";
 import { checkStatus, playerMove, playerInitialization } from "../../actions";
 class App extends Component {
   state = {
-    console: []
-    // auto: "True"
+    console: [],
+    auto: true
   };
 
   componentDidMount() {
@@ -76,6 +76,8 @@ class App extends Component {
     };
 
     function generateRoom() {
+      console.log("does this work?");
+
       if (map.includes(visitingRoom)) {
         return null;
       } else {
@@ -97,15 +99,20 @@ class App extends Component {
 
     function travel(direction) {
       let previousRoom = this.props.room.room_id;
+      console.log("We're moving!");
 
       if (direction) {
-        travel(direction);
-        generateRoom();
-        map[visitingRoom][reverseDirection[direction]] = previousRoom;
-        map[previousRoom][direction] = visitingRoom;
-        traversalPath.append(direction);
+        setTimeout(function() {
+          travel(direction);
+          this.props.playerMove({ direction: direction });
+          generateRoom();
+          map[visitingRoom][reverseDirection[direction]] = previousRoom;
+          map[previousRoom][direction] = visitingRoom;
+          traversalPath.append(direction);
+        }, 10000);
       } else {
         let roomList = backtrackToNearestUnexploredRoom();
+
         if (roomList.length === 0) {
           return false;
         }
@@ -161,7 +168,7 @@ class App extends Component {
     while (this.state.auto) {
       generateRoom();
       if (!travel(firstDirection)) {
-        break;
+        this.setState({ auto: false });
       }
     }
   };
