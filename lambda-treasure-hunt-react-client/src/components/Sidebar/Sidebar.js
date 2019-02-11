@@ -12,7 +12,7 @@ const Sidebar = props => {
       <h2>Player Information</h2>
       <ul>
         <li>Name: {props.status["name"]}</li>
-        <li>Cooldown: {props.status["cooldown"]}</li>
+        <li>Cooldown: {props.status["cooldown"]}%</li>
         <li>Gold: {props.status["gold"]}</li>
         <li>Inventory: {props.status["inventory"]}</li>
         <li>Encumberance: {props.status["encumbrance"]}</li>
