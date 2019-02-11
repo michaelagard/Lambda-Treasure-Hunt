@@ -18,6 +18,7 @@ class App extends Component {
   }
 
   componentWillReceiveProps(np) {
+    // Check if room data changes and updates the console with new data
     if (np.room !== this.props.room) {
       let consoleData = this.state.console;
       let msg = [
@@ -49,12 +50,15 @@ class App extends Component {
   checkInventory = () => {
     this.props.checkStatus();
   };
+
   // ------------------------ \\
   // Traversal Code Goes Here \\
   // ------------------------ \\
 
   breadthFirstTraversal = () => {
+    const traversalPath = [];
     const map = JSON.parse(localStorage.getItem("map"));
+
     let visitingRoom = this.props.room.room_id;
     let reverseDirection = {
       n: "s",
@@ -62,7 +66,7 @@ class App extends Component {
       w: "e",
       e: "w"
     };
-    let traversalPath = [];
+
     function generateRoom() {
       if (map.includes(visitingRoom)) {
         return null;
@@ -74,6 +78,7 @@ class App extends Component {
         }
       }
     }
+
     function firstDirection() {
       for (let path of this.map[visitingRoom]) {
         if (map[visitingRoom][path] === "?") {
@@ -81,8 +86,10 @@ class App extends Component {
         }
       }
     }
+
     function travel(direction) {
       let previousRoom = this.props.room.room_id;
+
       if (direction) {
         travel(direction);
         generateRoom();
@@ -94,6 +101,7 @@ class App extends Component {
         if (roomList.length === 0) {
           return false;
         }
+
         for (let direction in roomsToDirections(roomList)) {
           travel(direction);
           traversalPath.append(direction);
@@ -101,13 +109,16 @@ class App extends Component {
       }
       return true;
     }
+
     function backtrackToNearestUnexploredRoom() {
       let queue = [];
       let visited = [];
       queue.push([visitingRoom]);
+
       while (queue.length > 0) {
         let path = queue.shift();
         let node = path[queue.length - 1];
+
         if (node.includes(visited)) {
           return null;
         } else {
@@ -124,9 +135,20 @@ class App extends Component {
       }
       return [];
     }
+
     function roomsToDirections(roomList) {
       let currentRoom = roomList[0];
       let directionList = [];
+      for (let room in roomList.slice(1)) {
+        for (let exit in map[currentRoom]) {
+          if (map[currentRoom][exit] === room) {
+            directionList.append(exit);
+            currentRoom = room;
+            break;
+          }
+        }
+      }
+      return directionList;
     }
   };
 
