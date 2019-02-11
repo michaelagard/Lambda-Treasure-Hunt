@@ -78,10 +78,10 @@ class App extends Component {
     function generateRoom() {
       console.log("does this work?");
 
-      if (map.includes(visitingRoom)) {
+      if (Object.values(map).includes(visitingRoom)) {
         return null;
       } else {
-        for (let path of this.map[visitingRoom]) {
+        for (let path of map[visitingRoom]) {
           if (map[visitingRoom][path] === "?") {
             return path;
           }
@@ -186,6 +186,7 @@ class App extends Component {
           <Controls
             checkInventory={this.checkInventory}
             handleControls={this.handleControls}
+            startAuto={this.breadthFirstTraversal}
           />
         </BottomWrapper>
       </AppWrapper>
