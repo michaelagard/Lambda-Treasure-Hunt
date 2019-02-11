@@ -158,6 +158,12 @@ class App extends Component {
       }
       return directionList;
     }
+    while (this.state.auto) {
+      generateRoom();
+      if (!travel(firstDirection)) {
+        break;
+      }
+    }
   };
 
   // ------------------------ \\
