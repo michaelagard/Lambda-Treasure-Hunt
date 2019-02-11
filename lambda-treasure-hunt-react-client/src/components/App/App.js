@@ -33,16 +33,24 @@ class App extends Component {
       this.setState({
         console: consoleData
       });
+      // Add new data to map
+      if (np.room.coordinates !== this.props.coordinates) {
+        this.addToLocalStorage({
+          [np.room.room_id]: { coordinates: np.room.coordinates }
+        });
+      }
     }
   }
 
-  setMapPropsToStorage = () => {
-    localStorage.setItem("map", JSON.stringify(this.props.map));
+  addToLocalStorage = update => {
+    let oldMap = JSON.parse(localStorage.getItem("map"));
+    let newMapData = update;
+    let newMap = Object.assign(newMapData, oldMap);
+    localStorage.setItem("map", JSON.stringify(newMap));
   };
 
   handleControls = input => {
     if (input.match(/^(n|w|s|e)$/)) {
-      localStorage.setItem("test", input);
       this.props.playerMove({ direction: input });
     }
   };
