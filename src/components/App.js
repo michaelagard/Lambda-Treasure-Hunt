@@ -10,6 +10,7 @@ axios.defaults.headers.common["Authorization"] = `Token ${
 
 class App extends Component {
   state = {
+    cooldown: 6,
     room: {
       room_id: 0,
       title: "",
@@ -31,58 +32,52 @@ class App extends Component {
     if (!localStorage.getItem("map")) {
       localStorage.setItem("map", JSON.stringify({}));
     }
-    // this.init();
+    axios
+      .get(`https://lambda-treasure-hunt.herokuapp.com/api/adv/init/`)
+      .then(res => {
+        this.setState({ room: res.data });
+      });
   }
 
   addToLocalStorageMap = update => {
-    console.log(
-      `addToLocalStorageMap(update) called with update ${update} passed.`
-    );
-
     let oldMap = JSON.parse(localStorage.getItem("map"));
-    console.log(`Old Map: ${oldMap}`);
-    let newMapData = update;
-    let newMap = Object.assign({}, newMapData, oldMap);
+    let newMap = Object.assign({}, update, oldMap);
+    console.log(newMap);
     localStorage.setItem("map", JSON.stringify(newMap));
+  };
+  counter = 6;
+
+  autoMoveTest = () => {
+    this.timerID = setInterval(() => {
+      this.cooldownCountdown();
+    }, 1000);
+  };
+
+  cooldownCountdown = () => {
+    this.counter -= 1;
+    console.log(this.counter);
+
+    if (this.counter <= 0) {
+      clearInterval(this.timerID);
+      this.counter = this.cooldown;
+    }
   };
 
   playerMove = direction => {
-    console.log(
-      `playerMove(direction) called with direction ${direction} passed.`
-    );
-    this.timer(6);
+    this.counter -= 1;
     axios
       .post(
         `https://lambda-treasure-hunt.herokuapp.com/api/adv/move/`,
         direction
       )
       .then(res => {
-        console.log("playerMove(direction) finished.");
         this.setState({ room: res.data });
-        this.addToLocalStorageMap({ coordinates: res.data.room.coordinates });
-      });
-  };
-
-  timer = seconds => {
-    let timeleft = seconds;
-    setInterval(() => {
-      timeleft -= 1;
-      console.log(timeleft);
-      if (timeleft <= 0) {
-        clearInterval(this.timer);
-        return timeleft;
-      }
-    }, 1000);
-  };
-
-  init = () => {
-    console.log("init() called.");
-
-    axios
-      .get(`https://lambda-treasure-hunt.herokuapp.com/api/adv/init/`)
-      .then(res => {
-        this.setState({ room: res.data });
-        console.log("init() finished.");
+        this.addToLocalStorageMap({
+          [res.data.room_id]: {
+            coordinates: res.data.coordinates,
+            exits: res.data.exits
+          }
+        });
       });
   };
 
@@ -93,6 +88,7 @@ class App extends Component {
         <button onClick={() => this.playerMove({ direction: "s" })}>s</button>
         <button onClick={() => this.playerMove({ direction: "e" })}>e</button>
         <button onClick={() => this.playerMove({ direction: "w" })}>w</button>
+        <button onClick={() => this.autoMoveTest()}>Counter Test</button>
         <Controls />
         <Infobar />
         <Map />
