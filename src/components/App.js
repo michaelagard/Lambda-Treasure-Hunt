@@ -28,38 +28,61 @@ class App extends Component {
   };
 
   componentDidMount() {
-    this.init();
+    if (!localStorage.getItem("map")) {
+      localStorage.setItem("map", JSON.stringify({}));
+    }
+    // this.init();
   }
 
-  addToLocalStorage = update => {
+  addToLocalStorageMap = update => {
+    console.log(
+      `addToLocalStorageMap(update) called with update ${update} passed.`
+    );
+
     let oldMap = JSON.parse(localStorage.getItem("map"));
     console.log(`Old Map: ${oldMap}`);
     let newMapData = update;
-    let newMap = Object.assign(newMapData, oldMap);
+    let newMap = Object.assign({}, newMapData, oldMap);
     localStorage.setItem("map", JSON.stringify(newMap));
   };
 
   playerMove = direction => {
-    console.log("Sending movement data to remove server.");
+    console.log(
+      `playerMove(direction) called with direction ${direction} passed.`
+    );
+    this.timer(6);
     axios
       .post(
         `https://lambda-treasure-hunt.herokuapp.com/api/adv/move/`,
         direction
       )
       .then(res => {
+        console.log("playerMove(direction) finished.");
         this.setState({ room: res.data });
-        console.log(
-          "this.addToLocalStorage({ [res.data.room.room_id]: test })"
-        );
-        this.addToLocalStorage({ [res.data.room.room_id]: test });
+        this.addToLocalStorageMap({ coordinates: res.data.room.coordinates });
       });
   };
 
+  timer = seconds => {
+    let timeleft = seconds;
+    setInterval(() => {
+      timeleft -= 1;
+      console.log(timeleft);
+      if (timeleft <= 0) {
+        clearInterval(this.timer);
+        return timeleft;
+      }
+    }, 1000);
+  };
+
   init = () => {
+    console.log("init() called.");
+
     axios
       .get(`https://lambda-treasure-hunt.herokuapp.com/api/adv/init/`)
       .then(res => {
         this.setState({ room: res.data });
+        console.log("init() finished.");
       });
   };
 
