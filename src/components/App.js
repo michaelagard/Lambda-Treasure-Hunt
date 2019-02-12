@@ -31,15 +31,27 @@ class App extends Component {
     this.init();
   }
 
+  addToLocalStorage = update => {
+    let oldMap = JSON.parse(localStorage.getItem("map"));
+    console.log(`Old Map: ${oldMap}`);
+    let newMapData = update;
+    let newMap = Object.assign(newMapData, oldMap);
+    localStorage.setItem("map", JSON.stringify(newMap));
+  };
+
   playerMove = direction => {
+    console.log("Sending movement data to remove server.");
     axios
       .post(
         `https://lambda-treasure-hunt.herokuapp.com/api/adv/move/`,
         direction
       )
       .then(res => {
-        console.log(res.data);
         this.setState({ room: res.data });
+        console.log(
+          "this.addToLocalStorage({ [res.data.room.room_id]: test })"
+        );
+        this.addToLocalStorage({ [res.data.room.room_id]: test });
       });
   };
 
@@ -47,7 +59,6 @@ class App extends Component {
     axios
       .get(`https://lambda-treasure-hunt.herokuapp.com/api/adv/init/`)
       .then(res => {
-        console.log(res.data);
         this.setState({ room: res.data });
       });
   };
@@ -62,8 +73,16 @@ class App extends Component {
         <Controls />
         <Infobar />
         <Map />
-        {this.state.room.coordinates}
-        {this.state.room.exits}
+
+        <ul>
+          <li>Coordinates: {this.state.room.coordinates}</li>
+          <li>Exits: {this.state.room.exits}</li>
+          <li>Cooldown: {this.state.room.cooldown}</li>
+          <li>Room ID: {this.state.room.room_id}</li>
+          <li>Players: {this.state.room.players}</li>
+          <li>Errors: {this.state.room.errors}</li>
+          <li>Messages: {this.state.room.messages}</li>
+        </ul>
       </div>
     );
   }
