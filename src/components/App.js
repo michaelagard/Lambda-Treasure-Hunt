@@ -10,7 +10,7 @@ axios.defaults.headers.common["Authorization"] = `Token ${
 
 class App extends Component {
   state = {
-    cooldown: 6,
+    cooldown: 0,
     room: {
       room_id: 0,
       title: "",
@@ -21,13 +21,13 @@ class App extends Component {
       players: [],
       items: [],
       exits: [],
-      cooldown: 6,
+      cooldown: 4,
       errors: [],
       messages: []
     },
     player: {}
   };
-  counter = this.state.cooldown;
+
   componentDidMount() {
     if (!localStorage.getItem("map")) {
       localStorage.setItem("map", JSON.stringify({}));
@@ -46,27 +46,37 @@ class App extends Component {
   };
 
   autoMoveTest = () => {
-    this.timerID = setInterval(() => {
-      this.cooldownCountdown();
-    }, 1000);
+    // this.counter = this.state.cooldown;
+    // this.timerID = setInterval(() => {
+    //   this.cooldownCountdown();
+    // }, 1000);
   };
 
   cooldownCountdown = () => {
-    this.counter -= 1;
-    this.setState({
-      cooldown: this.counter
-    });
-    if (this.state.cooldown <= 0) {
-      clearInterval(this.timerID);
-    }
+    // this.counter -= 1;
+    // this.setState({
+    //   cooldown: this.counter
+    // });
+    // if (this.state.cooldown <= 0) {
+    //   clearInterval(this.timerID);
+    // }
   };
 
   generateExitsObject = exits => {
     let exitPaths = {};
     for (let i = 0; i < exits.length; i++) {
-      exitPaths[exits[i]] = "?";
+      if (exitPaths[exits[i]] === null) {
+        exitPaths[exits[i]] = "?";
+      }
     }
     return exitPaths;
+  };
+
+  addNewRoomsToExits = (newRoom, direction) => {
+    let map = JSON.parse(localStorage.getItem("map"));
+    map[this.state.room.room_id]["exits"][direction] = newRoom;
+    map[newRoom]["exits"][direction] = this.state.room.room_id;
+    this.addToLocalStorageMap({ map });
   };
 
   playerMove = direction => {
@@ -77,13 +87,13 @@ class App extends Component {
         direction
       )
       .then(res => {
+        this.addNewRoomsToExits(res.data.room_id);
         this.setState({ room: res.data, cooldown: res.data.cooldown });
-        this.counter = this.state.cooldown;
         if (!(res.data.room_id in JSON.parse(localStorage.getItem("map")))) {
           this.addToLocalStorageMap({
             [res.data.room_id]: {
               coordinates: res.data.coordinates,
-              exits: this.generateExitsObject(res.data.exits)
+              exits: this.generateExitsObject(res.data.exits, direction)
             }
           });
         }
@@ -93,10 +103,30 @@ class App extends Component {
   render() {
     return (
       <div className="App">
-        <button onClick={() => this.playerMove({ direction: "n" })}>n</button>
-        <button onClick={() => this.playerMove({ direction: "s" })}>s</button>
-        <button onClick={() => this.playerMove({ direction: "e" })}>e</button>
-        <button onClick={() => this.playerMove({ direction: "w" })}>w</button>
+        <button
+          disabled={this.state.cooldown >= 1}
+          onClick={() => this.playerMove({ direction: "n" })}
+        >
+          n
+        </button>
+        <button
+          disabled={this.state.cooldown >= 1}
+          onClick={() => this.playerMove({ direction: "s" })}
+        >
+          s
+        </button>
+        <button
+          disabled={this.state.cooldown >= 1}
+          onClick={() => this.playerMove({ direction: "e" })}
+        >
+          e
+        </button>
+        <button
+          disabled={this.state.cooldown >= 1}
+          onClick={() => this.playerMove({ direction: "w" })}
+        >
+          w
+        </button>
         <button onClick={() => this.autoMoveTest()}>Counter Test</button>
         <Controls />
         <Infobar />
