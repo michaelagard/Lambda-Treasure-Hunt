@@ -10,34 +10,59 @@ axios.defaults.headers.common["Authorization"] = `Token ${
 
 class App extends Component {
   state = {
-    cooldown: 0,
-    room: {
-      room_id: 0,
-      title: "",
-      description: "",
-      coordinates: "",
-      elevation: 0,
-      terrain: "",
-      players: [],
-      items: [],
-      exits: [],
-      cooldown: 4,
-      errors: [],
-      messages: []
-    },
-    player: {}
+    roomId: 0,
+    title: "",
+    description: "",
+    coordinates: "",
+    elevation: 0,
+    terrain: "",
+    players: [],
+    items: [],
+    exits: [],
+    cooldown: 4,
+    errors: [],
+    messages: [],
+    antiCompass: { n: "s", s: "n", e: "w", w: "e" }
   };
 
   componentDidMount() {
-    if (!localStorage.getItem("map")) {
-      localStorage.setItem("map", JSON.stringify({}));
-    }
     axios
       .get(`https://lambda-treasure-hunt.herokuapp.com/api/adv/init/`)
       .then(res => {
-        this.setState({ room: res.data });
+        this.updateState(res.data);
+        if (!localStorage.getItem("map")) {
+          localStorage.setItem("map", JSON.stringify({}));
+          if (!(this.state.roomId in JSON.parse(localStorage.getItem("map")))) {
+            this.addToLocalStorageMap({
+              [this.state.roomId]: {
+                coordinates: this.state.coordinates,
+                exits: this.generateExitsObject(
+                  this.state.exits,
+                  this.state.roomId
+                )
+              }
+            });
+          }
+        }
       });
   }
+
+  updateState = newState => {
+    this.setState({
+      roomId: newState.room_id,
+      title: newState.title,
+      description: newState.description,
+      coordinates: newState.coordinates,
+      elevation: newState.elevation,
+      terrain: newState.terrain,
+      players: newState.players,
+      items: newState.items,
+      exits: newState.exits,
+      cooldown: newState.cooldown,
+      errors: newState.errors,
+      messages: newState.messages
+    });
+  };
 
   addToLocalStorageMap = update => {
     let oldMap = JSON.parse(localStorage.getItem("map"));
@@ -69,25 +94,38 @@ class App extends Component {
     return newExits;
   };
 
-  addNewRoomToExit = (newRoom, direction) => {
+  addNewRoomToExit = (newRoom, previousRoom, direction) => {
     console.log("Does this run?");
-    // THIS LOGIC IS BACKWARDS, COME BACK TO THIS ONCE YOU'VE EATEN
+
     let map = JSON.parse(localStorage.getItem("map"));
-    map[this.state.room.room_id]["exits"][direction] = this.state.room.room_id;
-    map[newRoom]["exits"][direction] = newRoom;
+
+    map[previousRoom]["exits"][direction] = newRoom;
+
+    console.log(`${map[previousRoom]["exits"][direction]}`);
+
+    map[newRoom]["exits"][this.state.antiCompass[direction]] = previousRoom;
+    console.log(
+      `map[newRoom]["exits"][this.state.antiCompass[direction]] ${
+        map[newRoom]["exits"][this.state.antiCompass[direction]]
+      }: ${previousRoom}`
+    );
+
     console.log(map);
 
     this.addToLocalStorageMap(map);
   };
 
   playerMove = direction => {
+    let prevRoom = this.state.roomId;
     this.autoMoveTest();
     axios
       .post(`https://lambda-treasure-hunt.herokuapp.com/api/adv/move/`, {
         direction: direction
       })
       .then(res => {
-        this.setState({ room: res.data, cooldown: res.data.cooldown });
+        this.updateState(res.data);
+        console.log(res.data);
+
         if (!(res.data.room_id in JSON.parse(localStorage.getItem("map")))) {
           this.addToLocalStorageMap({
             [res.data.room_id]: {
@@ -96,7 +134,10 @@ class App extends Component {
             }
           });
         }
-        this.addNewRoomToExit(res.data.room_id, direction);
+        this.addNewRoomToExit(res.data.room_id, prevRoom, direction);
+      })
+      .catch(err => {
+        console.log(err);
       });
   };
 
@@ -104,25 +145,25 @@ class App extends Component {
     return (
       <div className="App">
         <button
-          disabled={this.state.cooldown >= 1}
+          disabled={this.state.cooldown >= 2}
           onClick={() => this.playerMove("n")}
         >
           n
         </button>
         <button
-          disabled={this.state.cooldown >= 1}
+          disabled={this.state.cooldown >= 2}
           onClick={() => this.playerMove("s")}
         >
           s
         </button>
         <button
-          disabled={this.state.cooldown >= 1}
+          disabled={this.state.cooldown >= 2}
           onClick={() => this.playerMove("e")}
         >
           e
         </button>
         <button
-          disabled={this.state.cooldown >= 1}
+          disabled={this.state.cooldown >= 2}
           onClick={() => this.playerMove("w")}
         >
           w
@@ -133,13 +174,13 @@ class App extends Component {
         <Map />
 
         <ul>
-          <li>Coordinates: {this.state.room.coordinates}</li>
-          <li>Exits: {this.state.room.exits}</li>
+          <li>Coordinates: {this.state.coordinates}</li>
+          <li>Exits: {this.state.exits}</li>
           <li>Cooldown: {this.state.cooldown}</li>
-          <li>Room ID: {this.state.room.room_id}</li>
-          <li>Players: {this.state.room.players}</li>
-          <li>Errors: {this.state.room.errors}</li>
-          <li>Messages: {this.state.room.messages}</li>
+          <li>Room ID: {this.state.roomId}</li>
+          <li>Players: {this.state.players}</li>
+          <li>Errors: {this.state.errors}</li>
+          <li>Messages: {this.state.messages}</li>
         </ul>
       </div>
     );
