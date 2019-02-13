@@ -46,57 +46,57 @@ class App extends Component {
   };
 
   autoMoveTest = () => {
-    // this.counter = this.state.cooldown;
-    // this.timerID = setInterval(() => {
-    //   this.cooldownCountdown();
-    // }, 1000);
+    this.counter = this.state.cooldown;
+    this.timerID = setInterval(() => {
+      this.cooldownCountdown();
+    }, 1000);
   };
 
   cooldownCountdown = () => {
-    // this.counter -= 1;
-    // this.setState({
-    //   cooldown: this.counter
-    // });
-    // if (this.state.cooldown <= 0) {
-    //   clearInterval(this.timerID);
-    // }
+    this.setState({
+      cooldown: this.state.cooldown - 1
+    });
+    if (this.state.cooldown <= 0) {
+      clearInterval(this.timerID);
+    }
   };
 
   generateExitsObject = exits => {
-    let exitPaths = {};
+    let newExits = {};
     for (let i = 0; i < exits.length; i++) {
-      if (exitPaths[exits[i]] === null) {
-        exitPaths[exits[i]] = "?";
-      }
+      newExits[exits[i]] = "?";
     }
-    return exitPaths;
+    return newExits;
   };
 
-  addNewRoomsToExits = (newRoom, direction) => {
+  addNewRoomToExit = (newRoom, direction) => {
+    console.log("Does this run?");
+    // THIS LOGIC IS BACKWARDS, COME BACK TO THIS ONCE YOU'VE EATEN
     let map = JSON.parse(localStorage.getItem("map"));
-    map[this.state.room.room_id]["exits"][direction] = newRoom;
-    map[newRoom]["exits"][direction] = this.state.room.room_id;
-    this.addToLocalStorageMap({ map });
+    map[this.state.room.room_id]["exits"][direction] = this.state.room.room_id;
+    map[newRoom]["exits"][direction] = newRoom;
+    console.log(map);
+
+    this.addToLocalStorageMap(map);
   };
 
   playerMove = direction => {
     this.autoMoveTest();
     axios
-      .post(
-        `https://lambda-treasure-hunt.herokuapp.com/api/adv/move/`,
-        direction
-      )
+      .post(`https://lambda-treasure-hunt.herokuapp.com/api/adv/move/`, {
+        direction: direction
+      })
       .then(res => {
-        this.addNewRoomsToExits(res.data.room_id);
         this.setState({ room: res.data, cooldown: res.data.cooldown });
         if (!(res.data.room_id in JSON.parse(localStorage.getItem("map")))) {
           this.addToLocalStorageMap({
             [res.data.room_id]: {
               coordinates: res.data.coordinates,
-              exits: this.generateExitsObject(res.data.exits, direction)
+              exits: this.generateExitsObject(res.data.exits, res.data.room_id)
             }
           });
         }
+        this.addNewRoomToExit(res.data.room_id, direction);
       });
   };
 
@@ -105,25 +105,25 @@ class App extends Component {
       <div className="App">
         <button
           disabled={this.state.cooldown >= 1}
-          onClick={() => this.playerMove({ direction: "n" })}
+          onClick={() => this.playerMove("n")}
         >
           n
         </button>
         <button
           disabled={this.state.cooldown >= 1}
-          onClick={() => this.playerMove({ direction: "s" })}
+          onClick={() => this.playerMove("s")}
         >
           s
         </button>
         <button
           disabled={this.state.cooldown >= 1}
-          onClick={() => this.playerMove({ direction: "e" })}
+          onClick={() => this.playerMove("e")}
         >
           e
         </button>
         <button
           disabled={this.state.cooldown >= 1}
-          onClick={() => this.playerMove({ direction: "w" })}
+          onClick={() => this.playerMove("w")}
         >
           w
         </button>
