@@ -21,13 +21,13 @@ class App extends Component {
       players: [],
       items: [],
       exits: [],
-      cooldown: 0,
+      cooldown: 6,
       errors: [],
       messages: []
     },
     player: {}
   };
-
+  counter = this.state.cooldown;
   componentDidMount() {
     if (!localStorage.getItem("map")) {
       localStorage.setItem("map", JSON.stringify({}));
@@ -42,10 +42,8 @@ class App extends Component {
   addToLocalStorageMap = update => {
     let oldMap = JSON.parse(localStorage.getItem("map"));
     let newMap = Object.assign({}, update, oldMap);
-    console.log(newMap);
     localStorage.setItem("map", JSON.stringify(newMap));
   };
-  counter = 6;
 
   autoMoveTest = () => {
     this.timerID = setInterval(() => {
@@ -55,29 +53,40 @@ class App extends Component {
 
   cooldownCountdown = () => {
     this.counter -= 1;
-    console.log(this.counter);
-
-    if (this.counter <= 0) {
+    this.setState({
+      cooldown: this.counter
+    });
+    if (this.state.cooldown <= 0) {
       clearInterval(this.timerID);
-      this.counter = this.cooldown;
     }
   };
 
+  generateExitsObject = exits => {
+    let exitPaths = {};
+    for (let i = 0; i < exits.length; i++) {
+      exitPaths[exits[i]] = "?";
+    }
+    return exitPaths;
+  };
+
   playerMove = direction => {
-    this.counter -= 1;
+    this.autoMoveTest();
     axios
       .post(
         `https://lambda-treasure-hunt.herokuapp.com/api/adv/move/`,
         direction
       )
       .then(res => {
-        this.setState({ room: res.data });
-        this.addToLocalStorageMap({
-          [res.data.room_id]: {
-            coordinates: res.data.coordinates,
-            exits: res.data.exits
-          }
-        });
+        this.setState({ room: res.data, cooldown: res.data.cooldown });
+        this.counter = this.state.cooldown;
+        if (!(res.data.room_id in JSON.parse(localStorage.getItem("map")))) {
+          this.addToLocalStorageMap({
+            [res.data.room_id]: {
+              coordinates: res.data.coordinates,
+              exits: this.generateExitsObject(res.data.exits)
+            }
+          });
+        }
       });
   };
 
@@ -96,7 +105,7 @@ class App extends Component {
         <ul>
           <li>Coordinates: {this.state.room.coordinates}</li>
           <li>Exits: {this.state.room.exits}</li>
-          <li>Cooldown: {this.state.room.cooldown}</li>
+          <li>Cooldown: {this.state.cooldown}</li>
           <li>Room ID: {this.state.room.room_id}</li>
           <li>Players: {this.state.room.players}</li>
           <li>Errors: {this.state.room.errors}</li>
