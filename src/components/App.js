@@ -66,7 +66,10 @@ class App extends Component {
 
   addToLocalStorageMap = update => {
     let oldMap = JSON.parse(localStorage.getItem("map"));
-    let newMap = Object.assign({}, update, oldMap);
+    let newMap = Object.assign({}, oldMap, update);
+    console.log("newMap");
+    console.log(newMap);
+
     localStorage.setItem("map", JSON.stringify(newMap));
   };
 
@@ -95,21 +98,10 @@ class App extends Component {
   };
 
   addNewRoomToExit = (newRoom, previousRoom, direction) => {
-    console.log("Does this run?");
-
     let map = JSON.parse(localStorage.getItem("map"));
-
     map[previousRoom]["exits"][direction] = newRoom;
-
-    console.log(`${map[previousRoom]["exits"][direction]}`);
-
     map[newRoom]["exits"][this.state.antiCompass[direction]] = previousRoom;
-    console.log(
-      `map[newRoom]["exits"][this.state.antiCompass[direction]] ${
-        map[newRoom]["exits"][this.state.antiCompass[direction]]
-      }: ${previousRoom}`
-    );
-
+    console.log("addNewRoomToExit()");
     console.log(map);
 
     this.addToLocalStorageMap(map);
