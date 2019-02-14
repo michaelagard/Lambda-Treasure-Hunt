@@ -76,7 +76,7 @@ class App extends Component {
     let map = JSON.parse(localStorage.getItem("map"));
     let exitString = "";
     for (let x in map[this.state.roomId]["exits"]) {
-      exitString += ` | ${x}: ${map[this.state.roomId]["exits"][x]} | `;
+      exitString += `${x}: ${map[this.state.roomId]["exits"][x]} | `;
     }
     this.setState({
       exits: exitString
@@ -93,38 +93,34 @@ class App extends Component {
     this.cooldownTimer = setInterval(() => {
       this.cooldownCountdown();
     }, 1000);
-
-    this.cooldownCountdown = () => {
-      this.setState({
-        cooldown: this.state.cooldown - 1
-      });
-      if (this.state.cooldown <= 0) {
-        clearInterval(this.cooldownTimer);
-        this.setState({
-          cooldown: 3
-        });
-        if (this.state.auto) {
-          this.moveToNextUnexploredRoom();
-          this.setState({
-            cooldown: 3,
-            canMove: false
-          });
-          this.autoMovement();
-        } else {
-          this.setState({
-            canMove: true
-          });
-        }
-      }
-    };
   };
 
-  moveToNextUnexploredRoom = () => {
+  cooldownCountdown = () => {
+    this.setState({
+      cooldown: this.state.cooldown - 1
+    });
+
+    if (this.state.cooldown <= 0) {
+      clearInterval(this.cooldownTimer);
+      this.setState({
+        cooldown: 3
+      });
+      if (this.newDirection()) {
+        this.playerMove(this.newDirection());
+      } else {
+        console.log("No available directions");
+      }
+    }
+  };
+
+  newDirection = () => {
     let map = JSON.parse(localStorage.getItem("map"));
     for (let path in map[this.state.roomId]["exits"]) {
       if (map[this.state.roomId]["exits"][path] === "?") {
-        console.log("There is an available path");
-        this.playerMove(path);
+        console.log(`Moving to the available path at: ${path}`);
+        return path;
+      } else {
+        return false;
       }
     }
   };
@@ -162,7 +158,9 @@ class App extends Component {
         }
         this.addNewRoomToExit(res.data.room_id, prevRoom, direction);
         this.stringifyExits();
-        this.autoMovement();
+        if (this.state.auto) {
+          this.autoMovement();
+        }
       })
       .catch(err => {
         console.log(err);
@@ -201,7 +199,9 @@ class App extends Component {
         >
           w
         </button>
-        <button onClick={() => this.autoMovement()}>Counter Test</button>
+        <button onClick={() => this.autoMovement()}>
+          Move To Unexplored Room
+        </button>
         <button
           onClick={() => {
             this.state.auto
