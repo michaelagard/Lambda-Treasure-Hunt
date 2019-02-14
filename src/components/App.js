@@ -60,7 +60,7 @@ class App extends Component {
       roomId: newState.room_id,
       title: newState.title,
       description: newState.description,
-      coordinates: newState.coordinates,
+      coordinates: newState.coordinates.replace(/["()]/gi, "").split(","),
       elevation: newState.elevation,
       terrain: newState.terrain,
       players: newState.players,
@@ -119,31 +119,9 @@ class App extends Component {
       if (map[this.state.roomId]["exits"][path] === "?") {
         console.log(`Moving to the available path at: ${path}`);
         return path;
-      } else {
-        return false;
       }
     }
-  };
-
-  sendCoordsToMap = () => {
-    let newCoords = [];
-    let coord = [];
-    let map = JSON.parse(localStorage.getItem("map"));
-    for (let id in map) {
-      coord.push(map[id]["coordinates"]);
-    }
-    for (let i = 0; i < coord.length; i++) {
-      newCoords.push(
-        parseInt(
-          coord[i]
-            .replace(/\(/g, "")
-            .replace(/\)/g, "")
-            .split(","),
-          10
-        )
-      );
-    }
-    console.log(newCoords);
+    return false;
   };
 
   generateExitsObject = exits => {
@@ -172,7 +150,9 @@ class App extends Component {
         if (!(res.data.room_id in JSON.parse(localStorage.getItem("map")))) {
           this.addToLocalStorageMap({
             [res.data.room_id]: {
-              coordinates: res.data.coordinates,
+              coordinates: res.data.coordinates
+                .replace(/["()]/gi, "")
+                .split(","),
               exits: this.generateExitsObject(res.data.exits, res.data.room_id)
             }
           });
