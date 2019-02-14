@@ -19,11 +19,12 @@ class App extends Component {
     players: [],
     items: [],
     exits: [],
-    cooldown: 5,
+    cooldown: 3,
     errors: [],
     messages: [],
     antiCompass: { n: "s", s: "n", e: "w", w: "e" },
-    auto: true
+    auto: true,
+    canMove: true
   };
 
   componentDidMount() {
@@ -88,24 +89,44 @@ class App extends Component {
     localStorage.setItem("map", JSON.stringify(newMap));
   };
 
-  autoMoveTest = () => {
-    this.timerID = setInterval(() => {
+  autoMovement = () => {
+    this.cooldownTimer = setInterval(() => {
       this.cooldownCountdown();
     }, 1000);
+
     this.cooldownCountdown = () => {
       this.setState({
         cooldown: this.state.cooldown - 1
       });
       if (this.state.cooldown <= 0) {
-        clearInterval(this.timerID);
+        clearInterval(this.cooldownTimer);
         this.setState({
-          cooldown: 5
+          cooldown: 3
         });
-        if (this.state.auto === true) {
-          this.nextUnexploredRoom();
+        if (this.state.auto) {
+          this.moveToNextUnexploredRoom();
+          this.setState({
+            cooldown: 3,
+            canMove: false
+          });
+          this.autoMovement();
+        } else {
+          this.setState({
+            canMove: true
+          });
         }
       }
     };
+  };
+
+  moveToNextUnexploredRoom = () => {
+    let map = JSON.parse(localStorage.getItem("map"));
+    for (let path in map[this.state.roomId]["exits"]) {
+      if (map[this.state.roomId]["exits"][path] === "?") {
+        console.log("There is an available path");
+        this.playerMove(path);
+      }
+    }
   };
 
   generateExitsObject = exits => {
@@ -140,22 +161,14 @@ class App extends Component {
           });
         }
         this.addNewRoomToExit(res.data.room_id, prevRoom, direction);
-        this.autoMoveTest();
+        this.stringifyExits();
+        this.autoMovement();
       })
       .catch(err => {
         console.log(err);
       });
   };
 
-  nextUnexploredRoom = () => {
-    let map = JSON.parse(localStorage.getItem("map"));
-    for (let path in map[this.state.roomId]["exits"]) {
-      if (path !== "?") {
-        this.playerMove(path);
-        break;
-      }
-    }
-  };
   /*** Look at each exit
    * for every one that doesn't have an id
    * check coord in that direction for a room I have explored before
@@ -165,30 +178,39 @@ class App extends Component {
     return (
       <div className="App">
         <button
-          disabled={this.state.cooldown > 2}
+          disabled={this.state.canMove === false}
           onClick={() => this.playerMove("n")}
         >
           n
         </button>
         <button
-          disabled={this.state.cooldown > 2}
+          disabled={this.state.canMove === false}
           onClick={() => this.playerMove("s")}
         >
           s
         </button>
         <button
-          disabled={this.state.cooldown > 2}
+          disabled={this.state.canMove === false}
           onClick={() => this.playerMove("e")}
         >
           e
         </button>
         <button
-          disabled={this.state.cooldown > 2}
+          disabled={this.state.canMove === false}
           onClick={() => this.playerMove("w")}
         >
           w
         </button>
-        <button onClick={() => this.autoMoveTest()}>Counter Test</button>
+        <button onClick={() => this.autoMovement()}>Counter Test</button>
+        <button
+          onClick={() => {
+            this.state.auto
+              ? this.setState({ auto: false })
+              : this.setState({ auto: true });
+          }}
+        >
+          Toggle Auto
+        </button>
         <Controls />
         <Infobar />
         <Map />
