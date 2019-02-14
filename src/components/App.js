@@ -125,6 +125,27 @@ class App extends Component {
     }
   };
 
+  sendCoordsToMap = () => {
+    let newCoords = [];
+    let coord = [];
+    let map = JSON.parse(localStorage.getItem("map"));
+    for (let id in map) {
+      coord.push(map[id]["coordinates"]);
+    }
+    for (let i = 0; i < coord.length; i++) {
+      newCoords.push(
+        parseInt(
+          coord[i]
+            .replace(/\(/g, "")
+            .replace(/\)/g, "")
+            .split(","),
+          10
+        )
+      );
+    }
+    console.log(newCoords);
+  };
+
   generateExitsObject = exits => {
     let newExits = {};
     for (let i = 0; i < exits.length; i++) {
@@ -210,6 +231,13 @@ class App extends Component {
           }}
         >
           Toggle Auto
+        </button>
+        <button
+          onClick={() => {
+            this.sendCoordsToMap();
+          }}
+        >
+          Temp Button
         </button>
         <Controls />
         <Infobar />
