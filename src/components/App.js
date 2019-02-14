@@ -19,10 +19,11 @@ class App extends Component {
     players: [],
     items: [],
     exits: [],
-    cooldown: 4,
+    cooldown: 5,
     errors: [],
     messages: [],
-    antiCompass: { n: "s", s: "n", e: "w", w: "e" }
+    antiCompass: { n: "s", s: "n", e: "w", w: "e" },
+    auto: true
   };
 
   componentDidMount() {
@@ -31,6 +32,7 @@ class App extends Component {
       .then(res => {
         this.updateState(res.data);
         if (!localStorage.getItem("map")) {
+          console.log("THERE IS NO MAP");
           localStorage.setItem("map", JSON.stringify({}));
           if (!(this.state.roomId in JSON.parse(localStorage.getItem("map")))) {
             this.addToLocalStorageMap({
@@ -43,7 +45,12 @@ class App extends Component {
               }
             });
           }
+        } else {
+          this.stringifyExits();
         }
+      })
+      .catch(err => {
+        console.log(err);
       });
   }
 
@@ -64,29 +71,41 @@ class App extends Component {
     });
   };
 
+  stringifyExits = () => {
+    let map = JSON.parse(localStorage.getItem("map"));
+    let exitString = "";
+    for (let x in map[this.state.roomId]["exits"]) {
+      exitString += ` | ${x}: ${map[this.state.roomId]["exits"][x]} | `;
+    }
+    this.setState({
+      exits: exitString
+    });
+  };
+
   addToLocalStorageMap = update => {
     let oldMap = JSON.parse(localStorage.getItem("map"));
     let newMap = Object.assign({}, oldMap, update);
-    console.log("newMap");
-    console.log(newMap);
-
     localStorage.setItem("map", JSON.stringify(newMap));
   };
 
   autoMoveTest = () => {
-    this.counter = this.state.cooldown;
     this.timerID = setInterval(() => {
       this.cooldownCountdown();
     }, 1000);
-  };
-
-  cooldownCountdown = () => {
-    this.setState({
-      cooldown: this.state.cooldown - 1
-    });
-    if (this.state.cooldown <= 0) {
-      clearInterval(this.timerID);
-    }
+    this.cooldownCountdown = () => {
+      this.setState({
+        cooldown: this.state.cooldown - 1
+      });
+      if (this.state.cooldown <= 0) {
+        clearInterval(this.timerID);
+        this.setState({
+          cooldown: 5
+        });
+        if (this.state.auto === true) {
+          this.nextUnexploredRoom();
+        }
+      }
+    };
   };
 
   generateExitsObject = exits => {
@@ -101,23 +120,17 @@ class App extends Component {
     let map = JSON.parse(localStorage.getItem("map"));
     map[previousRoom]["exits"][direction] = newRoom;
     map[newRoom]["exits"][this.state.antiCompass[direction]] = previousRoom;
-    console.log("addNewRoomToExit()");
-    console.log(map);
-
     this.addToLocalStorageMap(map);
   };
 
   playerMove = direction => {
     let prevRoom = this.state.roomId;
-    this.autoMoveTest();
     axios
       .post(`https://lambda-treasure-hunt.herokuapp.com/api/adv/move/`, {
         direction: direction
       })
       .then(res => {
         this.updateState(res.data);
-        console.log(res.data);
-
         if (!(res.data.room_id in JSON.parse(localStorage.getItem("map")))) {
           this.addToLocalStorageMap({
             [res.data.room_id]: {
@@ -127,35 +140,50 @@ class App extends Component {
           });
         }
         this.addNewRoomToExit(res.data.room_id, prevRoom, direction);
+        this.autoMoveTest();
       })
       .catch(err => {
         console.log(err);
       });
   };
 
+  nextUnexploredRoom = () => {
+    let map = JSON.parse(localStorage.getItem("map"));
+    for (let path in map[this.state.roomId]["exits"]) {
+      if (path !== "?") {
+        this.playerMove(path);
+        break;
+      }
+    }
+  };
+  /*** Look at each exit
+   * for every one that doesn't have an id
+   * check coord in that direction for a room I have explored before
+   * assign
+   */
   render() {
     return (
       <div className="App">
         <button
-          disabled={this.state.cooldown >= 2}
+          disabled={this.state.cooldown > 2}
           onClick={() => this.playerMove("n")}
         >
           n
         </button>
         <button
-          disabled={this.state.cooldown >= 2}
+          disabled={this.state.cooldown > 2}
           onClick={() => this.playerMove("s")}
         >
           s
         </button>
         <button
-          disabled={this.state.cooldown >= 2}
+          disabled={this.state.cooldown > 2}
           onClick={() => this.playerMove("e")}
         >
           e
         </button>
         <button
-          disabled={this.state.cooldown >= 2}
+          disabled={this.state.cooldown > 2}
           onClick={() => this.playerMove("w")}
         >
           w
