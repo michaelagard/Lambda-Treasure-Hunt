@@ -1,5 +1,6 @@
 import React, { Component } from "react";
 import axios from "axios";
+import styled from "styled-components";
 
 import Controls from "../components/Controls/Controls";
 import Infobar from "../components/Infobar/Infobar";
@@ -171,66 +172,57 @@ class App extends Component {
       });
   };
 
-  /*** Look at each exit
-   * for every one that doesn't have an id
-   * check coord in that direction for a room I have explored before
-   * assign
-   */
   render() {
     return (
-      <div className="App">
-        <button
-          disabled={this.state.canMove === false}
-          onClick={() => this.playerMove("n")}
-        >
-          n
-        </button>
-        <button
-          disabled={this.state.canMove === false}
-          onClick={() => this.playerMove("s")}
-        >
-          s
-        </button>
-        <button
-          disabled={this.state.canMove === false}
-          onClick={() => this.playerMove("e")}
-        >
-          e
-        </button>
-        <button
-          disabled={this.state.canMove === false}
-          onClick={() => this.playerMove("w")}
-        >
-          w
-        </button>
-        <button onClick={() => this.autoMovement()}>
-          Move To Unexplored Room
-        </button>
-        <button
-          onClick={() => {
-            this.state.auto
-              ? this.setState({ auto: false })
-              : this.setState({ auto: true });
-          }}
-        >
-          Toggle Auto
-        </button>
-
-        <Controls />
-        <Infobar
-          coordinates={this.state.coordinates}
-          exits={this.state.exits}
-          cooldown={this.state.cooldown}
-          roomId={this.state.roomId}
-          players={this.state.players}
-          errors={this.state.errors}
-          messages={this.state.messages}
-          description={this.state.description}
-        />
-        <Map roomId={this.state.roomId} />
-      </div>
+      <AppWrapper>
+        <TopWrapper>
+          <Map roomId={this.state.roomId} />
+          <Infobar
+            coordinates={this.state.coordinates}
+            exits={this.state.exits}
+            cooldown={this.state.cooldown}
+            roomId={this.state.roomId}
+            players={this.state.players}
+            errors={this.state.errors}
+            messages={this.state.messages}
+            description={this.state.description}
+          />
+        </TopWrapper>
+        <BottomWrapper>
+          <Controls
+            playerMove={this.playerMove}
+            autoMovement={this.autoMovement}
+            canMove={this.state.canMove}
+          />
+        </BottomWrapper>
+      </AppWrapper>
     );
   }
 }
+
+const AppWrapper = styled.div`
+  display: flex;
+  padding: 8px;
+  flex-direction: column;
+  height: 100vh;
+`;
+
+const TopWrapper = styled.div`
+  display: flex;
+  width: 100%;
+  height: 77%;
+  justify-content: space-around;
+  margin-bottom: 1%;
+  background: lightgray;
+`;
+
+const BottomWrapper = styled.div`
+  display: flex;
+  width: 100%;
+  max-height: 20%;
+  height: 20%;
+  justify-content: space-around;
+  background: lightgray;
+`;
 
 export default App;

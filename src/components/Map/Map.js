@@ -8,17 +8,20 @@ class Map extends Component {
 
     for (let roomId in map) {
       let coordinates = map[roomId]["coordinates"];
-      coordinates = [coordinates[0] - 48, 30 - (coordinates[1] - 53)];
+      coordinates = [coordinates[0] - 48, 30 - (coordinates[1] - 44)];
       let exits = map[roomId]["exits"];
-      let inputLeftVar = 32;
+      let inputLeftExitVar = 32;
+      let inputTopExitVar = 32;
+      let inputLeftRoomVar = 32;
+      let inputTopRoomVar = 32;
       for (let exit in exits) {
         if (exit === "n") {
           exitHalls.push(
             <Exits
               key={roomId + exit}
               className={roomId + exit}
-              inputLeft={`${coordinates[0] * inputLeftVar + 7}px`}
-              inputTop={`${coordinates[1] * inputLeftVar - 6}px`}
+              inputLeft={`${coordinates[0] * inputLeftExitVar + 7}px`}
+              inputTop={`${coordinates[1] * inputTopExitVar - 6}px`}
             />
           );
         } else if (exit === "s") {
@@ -26,8 +29,8 @@ class Map extends Component {
             <Exits
               key={roomId + exit}
               className={roomId + exit}
-              inputLeft={`${coordinates[0] * inputLeftVar + 7}px`}
-              inputTop={`${coordinates[1] * inputLeftVar + 20}px`}
+              inputLeft={`${coordinates[0] * inputLeftExitVar + 7}px`}
+              inputTop={`${coordinates[1] * inputTopExitVar + 20}px`}
             />
           );
         } else if (exit === "e") {
@@ -35,8 +38,8 @@ class Map extends Component {
             <Exits
               key={roomId + exit}
               className={roomId + exit}
-              inputLeft={`${coordinates[0] * inputLeftVar + 20}px`}
-              inputTop={`${coordinates[1] * inputLeftVar + 7}px`}
+              inputLeft={`${coordinates[0] * inputLeftExitVar + 20}px`}
+              inputTop={`${coordinates[1] * inputTopExitVar + 7}px`}
             />
           );
         } else if (exit === "w") {
@@ -44,8 +47,8 @@ class Map extends Component {
             <Exits
               key={roomId + exit}
               className={roomId + exit}
-              inputLeft={`${coordinates[0] * inputLeftVar - 6}px`}
-              inputTop={`${coordinates[1] * inputLeftVar + 7}px`}
+              inputLeft={`${coordinates[0] * inputLeftExitVar - 6}px`}
+              inputTop={`${coordinates[1] * inputTopExitVar + 7}px`}
             />
           );
         }
@@ -55,8 +58,8 @@ class Map extends Component {
         <Room
           key={roomId}
           className={roomId}
-          inputLeft={`${coordinates[0] * inputLeftVar}px`}
-          inputTop={`${coordinates[1] * inputLeftVar}px`}
+          inputLeft={`${coordinates[0] * inputLeftRoomVar}px`}
+          inputTop={`${coordinates[1] * inputTopRoomVar}px`}
           inputBackground={
             Number(roomId) === this.props.roomId ? `red` : `grey`
           }
@@ -95,9 +98,15 @@ const Exits = styled.div`
   background: black;
   left: ${props => props.inputLeft || "32px"};
   top: ${props => props.inputTop || "32px"};
-  z-index: 100;
+  z-index: 0;
 `;
 
 const MapWrapper = styled.div`
-  margin: 20px;
+  display: flex;
+  position: relative;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  overflow: hidden;
 `;
