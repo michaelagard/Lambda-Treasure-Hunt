@@ -4,3 +4,4 @@ Lambda-Treasure-Hunt.sublime-*
 *.pyc
 node_modules
 .gitmessage.txt
+/build
