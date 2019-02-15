@@ -4,6 +4,7 @@ import axios from "axios";
 import Controls from "../components/Controls/Controls";
 import Infobar from "../components/Infobar/Infobar";
 import Map from "../components/Map/Map";
+
 axios.defaults.headers.common["Authorization"] = `Token ${
   process.env.REACT_APP_AUTH_TOKEN
 }`;
@@ -221,7 +222,7 @@ class App extends Component {
         </button>
         <Controls />
         <Infobar />
-        <Map />
+        <Map roomId={this.state.roomId} />
 
         <ul>
           <li>Coordinates: {this.state.coordinates}</li>
@@ -231,6 +232,7 @@ class App extends Component {
           <li>Players: {this.state.players}</li>
           <li>Errors: {this.state.errors}</li>
           <li>Messages: {this.state.messages}</li>
+          <li>Messages: {this.state.description}</li>
         </ul>
       </div>
     );
