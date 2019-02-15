@@ -10,7 +10,7 @@ class Map extends Component {
 
     for (let roomId in map) {
       let coordinates = map[roomId]["coordinates"];
-      coordinates = [coordinates[0] - 45, 30 - (coordinates[1] - 55)];
+      coordinates = [coordinates[0] - 48, 30 - (coordinates[1] - 53)];
       let exits = map[roomId]["coordinates"][1];
 
       for (let exit in exits) {
@@ -44,7 +44,7 @@ class Map extends Component {
   };
 
   render() {
-    return <React.Fragment>{this.generateMapObject()}</React.Fragment>;
+    return <MapWrapper>{this.generateMapObject()}</MapWrapper>;
   }
 }
 
@@ -61,12 +61,17 @@ const Room = styled.div`
   background: ${props => props.inputBackground || "lightgrey"};
   font-size: 12px;
 `;
+
 const Exits = styled.div`
   position: absolute;
-  display: blocl;
+  display: block;
   width: 6px;
   height: 6px;
   background: black;
   left: ${props => props.inputLeft || "30px"};
   top: ${props => props.inputTop || "30px"};
+`;
+
+const MapWrapper = styled.div`
+  margin: 20px;
 `;
