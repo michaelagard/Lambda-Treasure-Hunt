@@ -135,7 +135,9 @@ class App extends Component {
 
   addNewRoomToExit = (newRoom, previousRoom, direction) => {
     let map = JSON.parse(localStorage.getItem("map"));
-    map[previousRoom]["exits"][direction] = newRoom;
+    if (map[previousRoom]["exits"][direction]) {
+      map[previousRoom]["exits"][direction] = newRoom;
+    }
     map[newRoom]["exits"][this.state.antiCompass[direction]] = previousRoom;
     this.addToLocalStorageMap(map);
   };
