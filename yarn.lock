@@ -3157,6 +3157,11 @@ dotenv@6.0.0:
   resolved "https://registry.yarnpkg.com/dotenv/-/dotenv-6.0.0.tgz#24e37c041741c5f4b25324958ebbc34bca965935"
   integrity sha512-FlWbnhgjtwD+uNLUGHbMykMOYQaTivdHEmYwAKFjn6GKe/CqY0fNae93ZHTd20snh9ZLr8mTzIL9m0APQ1pjQg==
 
+dragscroll@^0.0.8:
+  version "0.0.8"
+  resolved "https://registry.yarnpkg.com/dragscroll/-/dragscroll-0.0.8.tgz#de4771e5f3a14d77b583ecef5d38bd9618f27563"
+  integrity sha1-3kdx5fOhTXe1g+zvXTi9lhjydWM=
+
 duplexer@^0.1.1:
   version "0.1.1"
   resolved "https://registry.yarnpkg.com/duplexer/-/duplexer-0.1.1.tgz#ace6ff808c1ce66b57d1ebf97977acb02334cfc1"
