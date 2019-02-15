@@ -1,5 +1,7 @@
 import React, { Component } from "react";
 import styled from "styled-components";
+import dragscroll from "dragscroll"; // eslint-disable-line no-unused-vars
+
 class Map extends Component {
   generateMapObject = () => {
     let mapRooms = [];
@@ -72,7 +74,11 @@ class Map extends Component {
   };
 
   render() {
-    return <MapWrapper>{this.generateMapObject()}</MapWrapper>;
+    return (
+      <MapWrapper className={"dragscroll"}>
+        {this.generateMapObject()}
+      </MapWrapper>
+    );
   }
 }
 
