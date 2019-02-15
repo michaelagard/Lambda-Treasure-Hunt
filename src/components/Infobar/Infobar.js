@@ -1,9 +1,14 @@
 import React, { Component } from "react";
+import styled from "styled-components";
 
+const InfobarWrapper = styled.div`
+  display: flex;
+  width: 25%;
+`;
 class Infobar extends Component {
   render() {
     return (
-      <div className="Infobar">
+      <InfobarWrapper>
         <ul>
           <li>Coordinates: {this.props.coordinates}</li>
           <li>Exits: {this.props.exits}</li>
@@ -14,7 +19,7 @@ class Infobar extends Component {
           <li>Messages: {this.props.messages}</li>
           <li>Description: {this.props.description}</li>
         </ul>
-      </div>
+      </InfobarWrapper>
     );
   }
 }
