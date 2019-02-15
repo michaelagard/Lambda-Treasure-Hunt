@@ -213,27 +213,19 @@ class App extends Component {
         >
           Toggle Auto
         </button>
-        <button
-          onClick={() => {
-            this.sendCoordsToMap();
-          }}
-        >
-          Temp Button
-        </button>
-        <Controls />
-        <Infobar />
-        <Map roomId={this.state.roomId} />
 
-        <ul>
-          <li>Coordinates: {this.state.coordinates}</li>
-          <li>Exits: {this.state.exits}</li>
-          <li>Cooldown: {this.state.cooldown}</li>
-          <li>Room ID: {this.state.roomId}</li>
-          <li>Players: {this.state.players}</li>
-          <li>Errors: {this.state.errors}</li>
-          <li>Messages: {this.state.messages}</li>
-          <li>Messages: {this.state.description}</li>
-        </ul>
+        <Controls />
+        <Infobar
+          coordinates={this.state.coordinates}
+          exits={this.state.exits}
+          cooldown={this.state.cooldown}
+          roomId={this.state.roomId}
+          players={this.state.players}
+          errors={this.state.errors}
+          messages={this.state.messages}
+          description={this.state.description}
+        />
+        <Map roomId={this.state.roomId} />
       </div>
     );
   }
